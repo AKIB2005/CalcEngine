@@ -1,12 +1,15 @@
 {
   "name": "calculator",
   "version": "1.0.0",
-  "description": "",
+  "description": "Modern engineering calculator with Liquid Glass UI",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
+  },
+  "engines": {
+    "node": "22.x"
   },
   "keywords": [],
   "author": "",
