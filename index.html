@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Premium engineering calculator with scientific functions, unit conversions, number system tools, and engineering utilities. Built with liquid glass design." />
+  <title>CalcEngine — Engineering Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <div class="app-background">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="bg-orb bg-orb-4"></div>
+  </div>
+
+  <div id="app" class="app-container">
+    <!-- Top Bar -->
+    <header class="top-bar glass-panel">
+      <div class="top-bar-left">
+        <h1 class="app-title">
+          <span class="app-icon">⚡</span>
+          CalcEngine
+        </h1>
+      </div>
+      <div class="top-bar-center">
+        <div class="mode-switcher glass-panel-inner" role="tablist" aria-label="Calculator mode">
+          <button class="mode-btn active" data-mode="basic" role="tab" aria-selected="true" id="tab-basic">Basic</button>
+          <button class="mode-btn" data-mode="scientific" role="tab" aria-selected="false" id="tab-scientific">Scientific</button>
+          <button class="mode-btn" data-mode="engineering" role="tab" aria-selected="false" id="tab-engineering">Engineering</button>
+          <div class="mode-indicator"></div>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <button class="icon-btn" id="btn-history-toggle" aria-label="Toggle history panel" title="History">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-toolkit-toggle" aria-label="Toggle engineering toolkit" title="Engineering Toolkit">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Calculator Panel -->
+      <section class="calculator-panel" role="tabpanel">
+        <!-- Display -->
+        <div class="calc-display glass-panel">
+          <div class="display-status-bar">
+            <span class="angle-mode-badge" id="angle-mode-display">DEG</span>
+            <span class="memory-indicator" id="memory-indicator" style="display:none">M</span>
+            <button class="copy-btn" id="btn-copy-result" title="Copy result" aria-label="Copy result">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span class="copy-tooltip">Copied!</span>
+            </button>
+          </div>
+          <div class="display-expression" id="display-expression" aria-live="polite"></div>
+          <div class="display-result" id="display-result" aria-live="polite">0</div>
+          <div class="display-error" id="display-error" aria-live="assertive" style="display:none"></div>
+        </div>
+
+        <!-- Basic Keypad -->
+        <div class="keypad-container" id="keypad-basic">
+          <!-- Memory Row -->
+          <div class="keypad-row memory-row">
+            <button class="calc-btn btn-memory" data-action="mc" title="Memory Clear" aria-label="Memory Clear">MC</button>
+            <button class="calc-btn btn-memory" data-action="mr" title="Memory Recall" aria-label="Memory Recall">MR</button>
+            <button class="calc-btn btn-memory" data-action="m-plus" title="Memory Add" aria-label="Memory Add">M+</button>
+            <button class="calc-btn btn-memory" data-action="m-minus" title="Memory Subtract" aria-label="Memory Subtract">M−</button>
+          </div>
+          <!-- Row 1 -->
+          <div class="keypad-row">
+            <button class="calc-btn btn-clear" data-action="clear" aria-label="Clear">AC</button>
+            <button class="calc-btn btn-func" data-action="toggle-sign" aria-label="Toggle sign">±</button>
+            <button class="calc-btn btn-func" data-action="percent" aria-label="Percentage">%</button>
+            <button class="calc-btn btn-operator" data-action="operator" data-value="/" aria-label="Divide">÷</button>
+          </div>
+          <!-- Row 2 -->
+          <div class="keypad-row">
+            <button class="calc-btn btn-number" data-action="number" data-value="7" aria-label="7">7</button>
+            <button class="calc-btn btn-number" data-action="number" data-value="8" aria-label="8">8</button>
+            <button class="calc-btn btn-number" data-action="number" data-value="9" aria-label="9">9</button>
+            <button class="calc-btn btn-operator" data-action="operator" data-value="*" aria-label="Multiply">×</button>
+          </div>
+          <!-- Row 3 -->
+          <div class="keypad-row">
+            <button class="calc-btn btn-number" data-action="number" data-value="4" aria-label="4">4</button>
+            <button class="calc-btn btn-number" data-action="number" data-value="5" aria-label="5">5</button>
+            <button class="calc-btn btn-number" data-action="number" data-value="6" aria-label="6">6</button>
+            <button class="calc-btn btn-operator" data-action="operator" data-value="-" aria-label="Subtract">−</button>
+          </div>
+          <!-- Row 4 -->
+          <div class="keypad-row">
+            <button class="calc-btn btn-number" data-action="number" data-value="1" aria-label="1">1</button>
+            <button class="calc-btn btn-number" data-action="number" data-value="2" aria-label="2">2</button>
+            <button class="calc-btn btn-number" data-action="number" data-value="3" aria-label="3">3</button>
+            <button class="calc-btn btn-operator" data-action="operator" data-value="+" aria-label="Add">+</button>
+          </div>
+          <!-- Row 5 -->
+          <div class="keypad-row">
+            <button class="calc-btn btn-number btn-zero" data-action="number" data-value="0" aria-label="0">0</button>
+            <button class="calc-btn btn-number" data-action="decimal" aria-label="Decimal point">.</button>
+            <button class="calc-btn btn-backspace" data-action="backspace" aria-label="Backspace">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+            </button>
+            <button class="calc-btn btn-equals" data-action="equals" aria-label="Equals">=</button>
+          </div>
+        </div>
+
+        <!-- Scientific Keypad (additional rows) -->
+        <div class="keypad-container keypad-scientific" id="keypad-scientific" style="display:none">
+          <div class="scientific-controls">
+            <div class="angle-mode-switcher">
+              <button class="angle-btn active" data-angle="deg">DEG</button>
+              <button class="angle-btn" data-angle="rad">RAD</button>
+              <button class="angle-btn" data-angle="grad">GRAD</button>
+            </div>
+            <button class="calc-btn btn-func-sm" data-action="parenthesis" data-value="(" aria-label="Open parenthesis">(</button>
+            <button class="calc-btn btn-func-sm" data-action="parenthesis" data-value=")" aria-label="Close parenthesis">)</button>
+          </div>
+
+          <!-- Trig Row -->
+          <div class="keypad-row sci-row">
+            <button class="calc-btn btn-sci" data-action="function" data-value="sin" title="Sine" aria-label="Sine">sin</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="cos" title="Cosine" aria-label="Cosine">cos</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="tan" title="Tangent" aria-label="Tangent">tan</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="asin" title="Inverse Sine" aria-label="Inverse Sine">sin⁻¹</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="acos" title="Inverse Cosine" aria-label="Inverse Cosine">cos⁻¹</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="atan" title="Inverse Tangent" aria-label="Inverse Tangent">tan⁻¹</button>
+          </div>
+
+          <!-- Hyperbolic Row -->
+          <div class="keypad-row sci-row">
+            <button class="calc-btn btn-sci" data-action="function" data-value="sinh" title="Hyperbolic Sine" aria-label="Hyperbolic Sine">sinh</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="cosh" title="Hyperbolic Cosine" aria-label="Hyperbolic Cosine">cosh</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="tanh" title="Hyperbolic Tangent" aria-label="Hyperbolic Tangent">tanh</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="abs" title="Absolute Value" aria-label="Absolute Value">|x|</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="factorial" title="Factorial" aria-label="Factorial">n!</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="reciprocal" title="Reciprocal (1/x)" aria-label="Reciprocal">1/x</button>
+          </div>
+
+          <!-- Log / Power Row -->
+          <div class="keypad-row sci-row">
+            <button class="calc-btn btn-sci" data-action="function" data-value="log" title="Common Logarithm (base 10)" aria-label="Logarithm base 10">log</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="ln" title="Natural Logarithm" aria-label="Natural Logarithm">ln</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="exp" title="e raised to x" aria-label="e to the x">eˣ</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="pow10" title="10 raised to x" aria-label="10 to the x">10ˣ</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="sqrt" title="Square Root" aria-label="Square Root">√</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="cbrt" title="Cube Root" aria-label="Cube Root">∛</button>
+          </div>
+
+          <!-- Power / Constants Row -->
+          <div class="keypad-row sci-row">
+            <button class="calc-btn btn-sci" data-action="function" data-value="square" title="x squared" aria-label="Square">x²</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="cube" title="x cubed" aria-label="Cube">x³</button>
+            <button class="calc-btn btn-sci" data-action="power" title="x to the power y" aria-label="Power">xʸ</button>
+            <button class="calc-btn btn-sci" data-action="operator" data-value="%" title="Modulo" aria-label="Modulo">mod</button>
+            <button class="calc-btn btn-sci btn-const" data-action="constant" data-value="pi" title="Pi (π ≈ 3.14159)" aria-label="Pi">π</button>
+            <button class="calc-btn btn-sci btn-const" data-action="constant" data-value="e" title="Euler's number (e ≈ 2.71828)" aria-label="Euler's number">e</button>
+          </div>
+
+          <div class="keypad-row sci-row">
+            <button class="calc-btn btn-sci" data-action="function" data-value="nthroot" title="nth Root" aria-label="nth Root">ⁿ√x</button>
+            <button class="calc-btn btn-sci btn-const" data-action="constant" data-value="phi" title="Golden ratio (φ ≈ 1.61803)" aria-label="Golden ratio">φ</button>
+            <button class="calc-btn btn-sci" data-action="scientific-notation" title="Scientific Notation (EE)" aria-label="Scientific notation">EE</button>
+            <button class="calc-btn btn-sci" data-action="parenthesis" data-value="(" aria-label="Open parenthesis">(</button>
+            <button class="calc-btn btn-sci" data-action="parenthesis" data-value=")" aria-label="Close parenthesis">)</button>
+            <button class="calc-btn btn-sci" data-action="function" data-value="rand" title="Random number 0–1" aria-label="Random">Rand</button>
+          </div>
+        </div>
+
+        <!-- Engineering Mode -->
+        <div class="engineering-panel" id="panel-engineering" style="display:none">
+          <div class="eng-tabs glass-panel-inner">
+            <button class="eng-tab active" data-eng-tab="number-systems">Number Systems</button>
+            <button class="eng-tab" data-eng-tab="bitwise">Bitwise Ops</button>
+            <button class="eng-tab" data-eng-tab="electrical">Electrical</button>
+            <button class="eng-tab" data-eng-tab="unit-convert">Unit Convert</button>
+          </div>
+
+          <!-- Number Systems -->
+          <div class="eng-tab-content active" id="eng-number-systems">
+            <div class="eng-card glass-panel">
+              <h3 class="eng-card-title">Number System Converter</h3>
+              <div class="number-sys-grid">
+                <div class="num-sys-row">
+                  <label class="num-sys-label">DEC</label>
+                  <input type="text" class="glass-input num-sys-input" id="ns-decimal" placeholder="Decimal" data-base="10" />
+                </div>
+                <div class="num-sys-row">
+                  <label class="num-sys-label">BIN</label>
+                  <input type="text" class="glass-input num-sys-input" id="ns-binary" placeholder="Binary" data-base="2" />
+                </div>
+                <div class="num-sys-row">
+                  <label class="num-sys-label">OCT</label>
+                  <input type="text" class="glass-input num-sys-input" id="ns-octal" placeholder="Octal" data-base="8" />
+                </div>
+                <div class="num-sys-row">
+                  <label class="num-sys-label">HEX</label>
+                  <input type="text" class="glass-input num-sys-input" id="ns-hex" placeholder="Hexadecimal" data-base="16" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bitwise Operations -->
+          <div class="eng-tab-content" id="eng-bitwise" style="display:none">
+            <div class="eng-card glass-panel">
+              <h3 class="eng-card-title">Bitwise Operations</h3>
+              <div class="bitwise-grid">
+                <div class="bitwise-inputs">
+                  <input type="text" class="glass-input" id="bitwise-a" placeholder="Value A (decimal)" />
+                  <input type="text" class="glass-input" id="bitwise-b" placeholder="Value B (decimal)" />
+                </div>
+                <div class="bitwise-buttons">
+                  <button class="calc-btn btn-sci" data-bitwise="and">AND</button>
+                  <button class="calc-btn btn-sci" data-bitwise="or">OR</button>
+                  <button class="calc-btn btn-sci" data-bitwise="xor">XOR</button>
+                  <button class="calc-btn btn-sci" data-bitwise="not">NOT A</button>
+                  <button class="calc-btn btn-sci" data-bitwise="lshift">A &lt;&lt; B</button>
+                  <button class="calc-btn btn-sci" data-bitwise="rshift">A &gt;&gt; B</button>
+                </div>
+                <div class="bitwise-result glass-panel-inner">
+                  <span class="bitwise-result-label">Result:</span>
+                  <span class="bitwise-result-value" id="bitwise-result">—</span>
+                  <div class="bitwise-result-details" id="bitwise-details"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Electrical -->
+          <div class="eng-tab-content" id="eng-electrical" style="display:none">
+            <div class="eng-cards-grid">
+              <!-- Ohm's Law -->
+              <div class="eng-card glass-panel">
+                <h3 class="eng-card-title">Ohm's Law</h3>
+                <p class="eng-card-desc">V = I × R</p>
+                <div class="eng-inputs">
+                  <div class="eng-input-group">
+                    <label>Voltage (V)</label>
+                    <input type="number" class="glass-input" id="ohm-v" placeholder="Volts" step="any" />
+                  </div>
+                  <div class="eng-input-group">
+                    <label>Current (I)</label>
+                    <input type="number" class="glass-input" id="ohm-i" placeholder="Amps" step="any" />
+                  </div>
+                  <div class="eng-input-group">
+                    <label>Resistance (R)</label>
+                    <input type="number" class="glass-input" id="ohm-r" placeholder="Ohms" step="any" />
+                  </div>
+                </div>
+                <button class="calc-btn btn-equals eng-calc-btn" id="btn-ohm-calc">Calculate</button>
+                <div class="eng-result" id="ohm-result"></div>
+              </div>
+
+              <!-- Power Calculator -->
+              <div class="eng-card glass-panel">
+                <h3 class="eng-card-title">Power Calculator</h3>
+                <p class="eng-card-desc">P = V × I</p>
+                <div class="eng-inputs">
+                  <div class="eng-input-group">
+                    <label>Power (W)</label>
+                    <input type="number" class="glass-input" id="pwr-p" placeholder="Watts" step="any" />
+                  </div>
+                  <div class="eng-input-group">
+                    <label>Voltage (V)</label>
+                    <input type="number" class="glass-input" id="pwr-v" placeholder="Volts" step="any" />
+                  </div>
+                  <div class="eng-input-group">
+                    <label>Current (I)</label>
+                    <input type="number" class="glass-input" id="pwr-i" placeholder="Amps" step="any" />
+                  </div>
+                </div>
+                <button class="calc-btn btn-equals eng-calc-btn" id="btn-pwr-calc">Calculate</button>
+                <div class="eng-result" id="pwr-result"></div>
+              </div>
+
+              <!-- Resistance -->
+              <div class="eng-card glass-panel">
+                <h3 class="eng-card-title">Resistance Calculator</h3>
+                <p class="eng-card-desc">Series & Parallel</p>
+                <div class="eng-inputs">
+                  <div class="eng-input-group">
+                    <label>Resistances (comma-separated)</label>
+                    <input type="text" class="glass-input" id="res-values" placeholder="e.g. 100, 200, 300" />
+                  </div>
+                </div>
+                <div class="eng-btn-group">
+                  <button class="calc-btn btn-sci eng-calc-btn" id="btn-res-series">Series</button>
+                  <button class="calc-btn btn-sci eng-calc-btn" id="btn-res-parallel">Parallel</button>
+                </div>
+                <div class="eng-result" id="res-result"></div>
+              </div>
+
+              <!-- Frequency/Wavelength -->
+              <div class="eng-card glass-panel">
+                <h3 class="eng-card-title">Frequency ↔ Wavelength</h3>
+                <p class="eng-card-desc">λ = c / f</p>
+                <div class="eng-inputs">
+                  <div class="eng-input-group">
+                    <label>Frequency (Hz)</label>
+                    <input type="number" class="glass-input" id="fw-freq" placeholder="Frequency" step="any" />
+                  </div>
+                  <div class="eng-input-group">
+                    <label>Wavelength (m)</label>
+                    <input type="number" class="glass-input" id="fw-wave" placeholder="Wavelength" step="any" />
+                  </div>
+                </div>
+                <button class="calc-btn btn-equals eng-calc-btn" id="btn-fw-calc">Convert</button>
+                <div class="eng-result" id="fw-result"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unit Converter -->
+          <div class="eng-tab-content" id="eng-unit-convert" style="display:none">
+            <div class="eng-card glass-panel">
+              <h3 class="eng-card-title">Unit Converter</h3>
+              <div class="unit-converter">
+                <div class="eng-input-group">
+                  <label>Category</label>
+                  <select class="glass-input glass-select" id="unit-category">
+                    <option value="length">Length</option>
+                    <option value="mass">Mass</option>
+                    <option value="temperature">Temperature</option>
+                    <option value="time">Time</option>
+                    <option value="area">Area</option>
+                    <option value="volume">Volume</option>
+                    <option value="speed">Speed</option>
+                    <option value="pressure">Pressure</option>
+                    <option value="energy">Energy</option>
+                    <option value="power">Power</option>
+                    <option value="frequency">Frequency</option>
+                  </select>
+                </div>
+                <div class="unit-convert-row">
+                  <div class="eng-input-group">
+                    <label>From</label>
+                    <select class="glass-input glass-select" id="unit-from"></select>
+                  </div>
+                  <div class="eng-input-group unit-value-group">
+                    <label>Value</label>
+                    <input type="number" class="glass-input" id="unit-value" placeholder="Enter value" step="any" />
+                  </div>
+                  <div class="eng-input-group">
+                    <label>To</label>
+                    <select class="glass-input glass-select" id="unit-to"></select>
+                  </div>
+                </div>
+                <div class="unit-result glass-panel-inner" id="unit-result">
+                  <span class="unit-result-value">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Panel -->
+      <aside class="history-panel glass-panel" id="history-panel">
+        <div class="history-header">
+          <h2 class="history-title">History</h2>
+          <button class="icon-btn" id="btn-clear-history" title="Clear all history" aria-label="Clear all history">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="history-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <p>No calculations yet</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Engineering Toolkit Panel -->
+      <aside class="toolkit-panel glass-panel" id="toolkit-panel" style="display:none">
+        <div class="toolkit-header">
+          <h2 class="toolkit-title">Engineering Toolkit</h2>
+          <button class="icon-btn" id="btn-toolkit-close" title="Close toolkit" aria-label="Close toolkit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="toolkit-tabs">
+          <button class="toolkit-tab active" data-toolkit="quadratic">Quadratic</button>
+          <button class="toolkit-tab" data-toolkit="statistics">Statistics</button>
+          <button class="toolkit-tab" data-toolkit="matrix">Matrix</button>
+          <button class="toolkit-tab" data-toolkit="combinatorics">Combo</button>
+          <button class="toolkit-tab" data-toolkit="number-theory">Numbers</button>
+        </div>
+        <div class="toolkit-content">
+          <!-- Quadratic Solver -->
+          <div class="toolkit-section active" id="toolkit-quadratic">
+            <div class="eng-card glass-panel-inner">
+              <h3 class="eng-card-title">Quadratic Equation Solver</h3>
+              <p class="eng-card-desc">ax² + bx + c = 0</p>
+              <div class="eng-inputs">
+                <div class="eng-input-group">
+                  <label>a</label>
+                  <input type="number" class="glass-input" id="quad-a" placeholder="a" step="any" />
+                </div>
+                <div class="eng-input-group">
+                  <label>b</label>
+                  <input type="number" class="glass-input" id="quad-b" placeholder="b" step="any" />
+                </div>
+                <div class="eng-input-group">
+                  <label>c</label>
+                  <input type="number" class="glass-input" id="quad-c" placeholder="c" step="any" />
+                </div>
+              </div>
+              <button class="calc-btn btn-equals eng-calc-btn" id="btn-quad-solve">Solve</button>
+              <div class="eng-result" id="quad-result"></div>
+            </div>
+          </div>
+
+          <!-- Statistics -->
+          <div class="toolkit-section" id="toolkit-statistics" style="display:none">
+            <div class="eng-card glass-panel-inner">
+              <h3 class="eng-card-title">Statistics Calculator</h3>
+              <p class="eng-card-desc">Enter comma-separated values</p>
+              <div class="eng-inputs">
+                <div class="eng-input-group" style="width:100%">
+                  <label>Data Set</label>
+                  <input type="text" class="glass-input" id="stats-data" placeholder="e.g. 10, 20, 30, 40, 50" />
+                </div>
+              </div>
+              <button class="calc-btn btn-equals eng-calc-btn" id="btn-stats-calc">Calculate</button>
+              <div class="eng-result stats-result" id="stats-result"></div>
+            </div>
+          </div>
+
+          <!-- Matrix -->
+          <div class="toolkit-section" id="toolkit-matrix" style="display:none">
+            <div class="eng-card glass-panel-inner">
+              <h3 class="eng-card-title">Matrix Calculator</h3>
+              <div class="matrix-size-select">
+                <label>Size:</label>
+                <select class="glass-input glass-select" id="matrix-size">
+                  <option value="2">2×2</option>
+                  <option value="3">3×3</option>
+                </select>
+              </div>
+              <div class="matrix-grid-container">
+                <div class="matrix-section">
+                  <label class="matrix-label">Matrix A</label>
+                  <div class="matrix-grid" id="matrix-a-grid"></div>
+                </div>
+                <div class="matrix-section">
+                  <label class="matrix-label">Matrix B</label>
+                  <div class="matrix-grid" id="matrix-b-grid"></div>
+                </div>
+              </div>
+              <div class="matrix-buttons">
+                <button class="calc-btn btn-sci" data-matrix-op="add">A + B</button>
+                <button class="calc-btn btn-sci" data-matrix-op="subtract">A − B</button>
+                <button class="calc-btn btn-sci" data-matrix-op="multiply">A × B</button>
+                <button class="calc-btn btn-sci" data-matrix-op="det-a">det(A)</button>
+                <button class="calc-btn btn-sci" data-matrix-op="det-b">det(B)</button>
+                <button class="calc-btn btn-sci" data-matrix-op="transpose-a">Aᵀ</button>
+              </div>
+              <div class="matrix-result-section">
+                <label class="matrix-label">Result</label>
+                <div class="matrix-grid" id="matrix-result-grid"></div>
+                <div class="eng-result" id="matrix-scalar-result"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Combinatorics -->
+          <div class="toolkit-section" id="toolkit-combinatorics" style="display:none">
+            <div class="eng-card glass-panel-inner">
+              <h3 class="eng-card-title">Permutations & Combinations</h3>
+              <div class="eng-inputs">
+                <div class="eng-input-group">
+                  <label>n</label>
+                  <input type="number" class="glass-input" id="comb-n" placeholder="n" min="0" />
+                </div>
+                <div class="eng-input-group">
+                  <label>r</label>
+                  <input type="number" class="glass-input" id="comb-r" placeholder="r" min="0" />
+                </div>
+              </div>
+              <div class="eng-btn-group">
+                <button class="calc-btn btn-sci eng-calc-btn" id="btn-perm">P(n,r)</button>
+                <button class="calc-btn btn-sci eng-calc-btn" id="btn-comb">C(n,r)</button>
+                <button class="calc-btn btn-sci eng-calc-btn" id="btn-fact-n">n!</button>
+              </div>
+              <div class="eng-result" id="comb-result"></div>
+            </div>
+            <div class="eng-card glass-panel-inner" style="margin-top:12px">
+              <h3 class="eng-card-title">Percentage Calculator</h3>
+              <div class="eng-inputs">
+                <div class="eng-input-group">
+                  <label>Value</label>
+                  <input type="number" class="glass-input" id="pct-value" placeholder="Value" step="any" />
+                </div>
+                <div class="eng-input-group">
+                  <label>Percentage %</label>
+                  <input type="number" class="glass-input" id="pct-percent" placeholder="%" step="any" />
+                </div>
+              </div>
+              <button class="calc-btn btn-equals eng-calc-btn" id="btn-pct-calc">Calculate</button>
+              <div class="eng-result" id="pct-result"></div>
+            </div>
+          </div>
+
+          <!-- Number Theory -->
+          <div class="toolkit-section" id="toolkit-number-theory" style="display:none">
+            <div class="eng-card glass-panel-inner">
+              <h3 class="eng-card-title">GCD / LCM</h3>
+              <div class="eng-inputs">
+                <div class="eng-input-group">
+                  <label>Number A</label>
+                  <input type="number" class="glass-input" id="gcd-a" placeholder="A" min="1" />
+                </div>
+                <div class="eng-input-group">
+                  <label>Number B</label>
+                  <input type="number" class="glass-input" id="gcd-b" placeholder="B" min="1" />
+                </div>
+              </div>
+              <div class="eng-btn-group">
+                <button class="calc-btn btn-sci eng-calc-btn" id="btn-gcd">GCD</button>
+                <button class="calc-btn btn-sci eng-calc-btn" id="btn-lcm">LCM</button>
+              </div>
+              <div class="eng-result" id="gcd-result"></div>
+            </div>
+            <div class="eng-card glass-panel-inner" style="margin-top:12px">
+              <h3 class="eng-card-title">Prime Checker</h3>
+              <div class="eng-inputs">
+                <div class="eng-input-group">
+                  <label>Number</label>
+                  <input type="number" class="glass-input" id="prime-input" placeholder="Enter a number" min="2" />
+                </div>
+              </div>
+              <button class="calc-btn btn-equals eng-calc-btn" id="btn-prime-check">Check</button>
+              <div class="eng-result" id="prime-result"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Overlay for mobile drawers -->
+  <div class="panel-overlay" id="panel-overlay"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
